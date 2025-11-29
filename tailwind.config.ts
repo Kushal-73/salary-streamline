@@ -13,6 +13,10 @@ export default {
       },
     },
     extend: {
+      fontFamily: {
+        'sans': ['Sora', 'system-ui', 'sans-serif'],
+        'display': ['DM Serif Display', 'Georgia', 'serif'],
+      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
@@ -60,14 +64,17 @@ export default {
         'gradient-primary': 'var(--gradient-primary)',
         'gradient-accent': 'var(--gradient-accent)',
         'gradient-hero': 'var(--gradient-hero)',
+        'gradient-mesh': 'var(--gradient-mesh)',
       },
       boxShadow: {
         'sm': 'var(--shadow-sm)',
         'md': 'var(--shadow-md)',
         'lg': 'var(--shadow-lg)',
+        'glow': 'var(--shadow-glow)',
       },
       transitionProperty: {
         'smooth': 'var(--transition-smooth)',
+        'bounce': 'var(--transition-bounce)',
       },
       borderRadius: {
         lg: "var(--radius)",
