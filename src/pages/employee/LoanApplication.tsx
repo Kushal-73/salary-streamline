@@ -251,7 +251,7 @@ const LoanApplication = () => {
 
             {/* Sidebar */}
             <div className="space-y-6">
-              <Card className="sticky top-24">
+              <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Calculator className="w-5 h-5" />

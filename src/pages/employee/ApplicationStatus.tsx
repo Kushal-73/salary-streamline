@@ -7,7 +7,7 @@ import { CheckCircle2, Clock, XCircle, ArrowRight } from "lucide-react";
 import { motion } from "framer-motion";
 
 const ApplicationStatus = () => {
-  const [status] = useState<"pending" | "approved" | "rejected">("approved"); // Can be: "pending", "approved", "rejected"
+  const [status] = useState<"pending" | "approved" | "rejected">("pending"); // Can be: "pending", "approved", "rejected"
 
   return (
     <div className="min-h-screen bg-background">
