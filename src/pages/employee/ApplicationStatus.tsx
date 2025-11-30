@@ -5,10 +5,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { CheckCircle2, Clock, XCircle, ArrowRight } from "lucide-react";
 import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 
 const ApplicationStatus = () => {
   const [status] = useState<"pending" | "approved" | "rejected">("pending"); // Can be: "pending", "approved", "rejected"
-
+  const navigate = useNavigate();
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
@@ -65,6 +66,37 @@ const ApplicationStatus = () => {
               </Card>
             </motion.div>
           )}
+          {/* Sample Navigation Buttons */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+          >
+            <Card className="mt-8">
+              <CardHeader>
+                <CardTitle className="font-display text-center">View Sample Outcomes</CardTitle>
+                <CardDescription className="text-center">
+                  Click below to see sample pages for approved or rejected applications
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="flex gap-4">
+                <Button 
+                  onClick={() => navigate("/employee/loan-approved")} 
+                  variant="default"
+                  className="flex-1"
+                >
+                  View Approved Sample
+                </Button>
+                <Button 
+                  onClick={() => navigate("/employee/loan-rejected")} 
+                  variant="outline"
+                  className="flex-1"
+                >
+                  View Rejected Sample
+                </Button>
+              </CardContent>
+            </Card>
+          </motion.div>
 
           {status === "approved" && (
             <motion.div

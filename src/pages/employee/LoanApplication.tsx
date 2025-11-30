@@ -9,11 +9,32 @@ import { Slider } from "@/components/ui/slider";
 import { useToast } from "@/hooks/use-toast";
 import { motion } from "framer-motion";
 import { Calculator, Upload, CheckCircle2, ChevronRight } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
 
 const LoanApplication = () => {
   const [step, setStep] = useState(1);
   const [loanAmount, setLoanAmount] = useState(100000);
   const [tenure, setTenure] = useState(12);
+  const [isSameAddress, setIsSameAddress] = useState(false);
+  const [correspondenceAddress, setCorrespondenceAddress] = useState({
+    state: "",
+    city: "",
+    pincode: "",
+    street: "",
+    landmark: ""
+  });
+  const [permanentAddress, setPermanentAddress] = useState({
+    state: "",
+    city: "",
+    pincode: "",
+    street: "",
+    landmark: ""
+  });
+  const [otp, setOtp] = useState("");
+  const [isOtpSent, setIsOtpSent] = useState(false);
+  const [isOtpVerified, setIsOtpVerified] = useState(false);
+  const [otpCountdown, setOtpCountdown] = useState(0);
+  
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -21,6 +42,91 @@ const LoanApplication = () => {
     const rate = 12 / 12 / 100; // 12% annual rate
     const emi = (loanAmount * rate * Math.pow(1 + rate, tenure)) / (Math.pow(1 + rate, tenure) - 1);
     return Math.round(emi);
+  };
+
+  const handleCorrespondenceAddressChange = (field, value) => {
+    const updatedAddress = {
+      ...correspondenceAddress,
+      [field]: value
+    };
+    setCorrespondenceAddress(updatedAddress);
+    
+    // If same address is checked, update permanent address too
+    if (isSameAddress) {
+      setPermanentAddress(updatedAddress);
+    }
+  };
+
+  const handlePermanentAddressChange = (field, value) => {
+    setPermanentAddress({
+      ...permanentAddress,
+      [field]: value
+    });
+  };
+
+  const handleSameAddressChange = (checked) => {
+    setIsSameAddress(checked);
+    if (checked) {
+      // Copy correspondence address to permanent address
+      setPermanentAddress(correspondenceAddress);
+    } else {
+      // Clear permanent address when unchecked
+      setPermanentAddress({
+        state: "",
+        city: "",
+        pincode: "",
+        street: "",
+        landmark: ""
+      });
+    }
+  };
+
+  const handleSendOtp = () => {
+    // Simulate OTP sending
+    setIsOtpSent(true);
+    setIsOtpVerified(false);
+    setOtpCountdown(30);
+    
+    // Start countdown timer
+    const timer = setInterval(() => {
+      setOtpCountdown((prev) => {
+        if (prev <= 1) {
+          clearInterval(timer);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    toast({
+      title: "OTP Sent!",
+      description: "Verification code has been sent to your registered mobile number.",
+    });
+  };
+
+  const handleVerifyOtp = () => {
+    // Simulate OTP verification
+    if (otp.length === 6) {
+      setIsOtpVerified(true);
+      toast({
+        title: "OTP Verified!",
+        description: "Your account has been successfully verified.",
+      });
+    } else {
+      toast({
+        title: "Invalid OTP",
+        description: "Please enter a valid 6-digit OTP.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleResendOtp = () => {
+    handleSendOtp();
+    toast({
+      title: "OTP Resent!",
+      description: "New verification code has been sent to your registered mobile number.",
+    });
   };
 
   const handleSubmit = () => {
@@ -71,14 +177,161 @@ const LoanApplication = () => {
                       </div>
                     </div>
 
-                    <div className="space-y-2">
-                      <Label htmlFor="address">Correspondence Address</Label>
-                      <Input id="address" placeholder="Enter your current address" />
+                    {/* Correspondence Address Section */}
+                    <div className="space-y-4 pt-4 border-t">
+                      <Label className="text-lg font-semibold">Correspondence Address</Label>
+                      
+                      <div className="grid md:grid-cols-3 gap-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="state">State</Label>
+                          <Input 
+                            id="state" 
+                            placeholder="Enter state" 
+                            value={correspondenceAddress.state}
+                            onChange={(e) => handleCorrespondenceAddressChange("state", e.target.value)}
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="city">City</Label>
+                          <Input 
+                            id="city" 
+                            placeholder="Enter city" 
+                            value={correspondenceAddress.city}
+                            onChange={(e) => handleCorrespondenceAddressChange("city", e.target.value)}
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="pincode">Pincode</Label>
+                          <Input 
+                            id="pincode" 
+                            placeholder="Enter pincode" 
+                            value={correspondenceAddress.pincode}
+                            onChange={(e) => handleCorrespondenceAddressChange("pincode", e.target.value)}
+                          />
+                        </div>
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="street">Street Address</Label>
+                        <Input 
+                          id="street" 
+                          placeholder="Enter street address" 
+                          value={correspondenceAddress.street}
+                          onChange={(e) => handleCorrespondenceAddressChange("street", e.target.value)}
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="landmark">Landmark (Optional)</Label>
+                        <Input 
+                          id="landmark" 
+                          placeholder="Enter nearby landmark" 
+                          value={correspondenceAddress.landmark}
+                          onChange={(e) => handleCorrespondenceAddressChange("landmark", e.target.value)}
+                        />
+                      </div>
                     </div>
 
-                    <div className="space-y-2">
-                      <Label htmlFor="permanent">Permanent Address</Label>
-                      <Input id="permanent" placeholder="Enter permanent address" />
+                    {/* Permanent Address Section */}
+                    <div className="space-y-4 pt-4 border-t">
+                      <Label className="text-lg font-semibold">Permanent Address</Label>
+
+                      <div className="flex items-center space-x-2 mb-4">
+                        <Checkbox 
+                          id="sameAddress" 
+                          checked={isSameAddress}
+                          onCheckedChange={handleSameAddressChange}
+                        />
+                        <Label 
+                          htmlFor="sameAddress" 
+                          className="text-sm text-muted-foreground cursor-pointer"
+                        >
+                          Same as correspondence address
+                        </Label>
+                      </div>
+
+                      {!isSameAddress && (
+                        <>
+                          <div className="grid md:grid-cols-3 gap-4">
+                            <div className="space-y-2">
+                              <Label htmlFor="permanentState">State</Label>
+                              <Input 
+                                id="permanentState" 
+                                placeholder="Enter state" 
+                                value={permanentAddress.state}
+                                onChange={(e) => handlePermanentAddressChange("state", e.target.value)}
+                              />
+                            </div>
+                            <div className="space-y-2">
+                              <Label htmlFor="permanentCity">City</Label>
+                              <Input 
+                                id="permanentCity" 
+                                placeholder="Enter city" 
+                                value={permanentAddress.city}
+                                onChange={(e) => handlePermanentAddressChange("city", e.target.value)}
+                              />
+                            </div>
+                            <div className="space-y-2">
+                              <Label htmlFor="permanentPincode">Pincode</Label>
+                              <Input 
+                                id="permanentPincode" 
+                                placeholder="Enter pincode" 
+                                value={permanentAddress.pincode}
+                                onChange={(e) => handlePermanentAddressChange("pincode", e.target.value)}
+                              />
+                            </div>
+                          </div>
+
+                          <div className="space-y-2">
+                            <Label htmlFor="permanentStreet">Street Address</Label>
+                            <Input 
+                              id="permanentStreet" 
+                              placeholder="Enter street address" 
+                              value={permanentAddress.street}
+                              onChange={(e) => handlePermanentAddressChange("street", e.target.value)}
+                            />
+                          </div>
+
+                          <div className="space-y-2">
+                            <Label htmlFor="permanentLandmark">Landmark (Optional)</Label>
+                            <Input 
+                              id="permanentLandmark" 
+                              placeholder="Enter nearby landmark" 
+                              value={permanentAddress.landmark}
+                              onChange={(e) => handlePermanentAddressChange("landmark", e.target.value)}
+                            />
+                          </div>
+                        </>
+                      )}
+
+                      {isSameAddress && (
+                        <div className="bg-muted rounded-lg p-4 space-y-3">
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+                            <div>
+                              <span className="font-medium">State:</span>
+                              <p className="text-muted-foreground mt-1">{correspondenceAddress.state || "Not provided"}</p>
+                            </div>
+                            <div>
+                              <span className="font-medium">City:</span>
+                              <p className="text-muted-foreground mt-1">{correspondenceAddress.city || "Not provided"}</p>
+                            </div>
+                            <div>
+                              <span className="font-medium">Pincode:</span>
+                              <p className="text-muted-foreground mt-1">{correspondenceAddress.pincode || "Not provided"}</p>
+                            </div>
+                            <div>
+                              <span className="font-medium">Street:</span>
+                              <p className="text-muted-foreground mt-1">{correspondenceAddress.street || "Not provided"}</p>
+                            </div>
+                            {correspondenceAddress.landmark && (
+                              <div className="md:col-span-2">
+                                <span className="font-medium">Landmark:</span>
+                                <p className="text-muted-foreground mt-1">{correspondenceAddress.landmark}</p>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      )}
                     </div>
 
                     <Button onClick={() => setStep(2)} className="w-full bg-gradient-accent">
@@ -153,13 +406,94 @@ const LoanApplication = () => {
                       <Input id="confirm" placeholder="Re-enter account number" />
                     </div>
 
-                    <div className="bg-success/10 border border-success/20 rounded-lg p-4">
-                      <div className="flex items-center gap-2 text-success mb-2">
+                    {/* OTP Verification Section */}
+                    <div className="space-y-4 pt-4 border-t">
+                      <div className="space-y-3">
+                        <Label className="text-lg font-semibold">Account Verification</Label>
+                        <p className="text-sm text-muted-foreground">
+                          OTP will be sent to your registered mobile number for account verification and eNACH mandate
+                        </p>
+                        
+                        {!isOtpSent ? (
+                          <Button 
+                            onClick={handleSendOtp} 
+                            variant="outline" 
+                            className="w-full"
+                          >
+                            Send OTP to Registered Mobile
+                          </Button>
+                        ) : (
+                          <div className="space-y-3">
+                            <div className="space-y-2">
+                              <Label htmlFor="otp">Enter OTP</Label>
+                              <div className="flex gap-2">
+                                <Input 
+                                  id="otp"
+                                  type="text"
+                                  placeholder="Enter 6-digit OTP"
+                                  value={otp}
+                                  onChange={(e) => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                                  className="flex-1"
+                                  disabled={isOtpVerified}
+                                />
+                                {!isOtpVerified && (
+                                  <Button 
+                                    onClick={handleVerifyOtp}
+                                    className="bg-gradient-accent"
+                                    disabled={otp.length !== 6}
+                                  >
+                                    Verify
+                                  </Button>
+                                )}
+                              </div>
+                            </div>
+
+                            {!isOtpVerified && (
+                              <div className="flex justify-between items-center">
+                                <p className="text-sm text-muted-foreground">
+                                  {otpCountdown > 0 
+                                    ? `Resend OTP in ${otpCountdown}s`
+                                    : "Didn't receive OTP?"
+                                  }
+                                </p>
+                                <Button
+                                  variant="link"
+                                  onClick={handleResendOtp}
+                                  disabled={otpCountdown > 0}
+                                  className="p-0 h-auto"
+                                >
+                                  Resend OTP
+                                </Button>
+                              </div>
+                            )}
+
+                            {isOtpVerified && (
+                              <div className="flex items-center gap-2 text-success text-sm">
+                                <CheckCircle2 className="w-4 h-4" />
+                                <span>OTP verified successfully</span>
+                              </div>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className={`rounded-lg p-4 ${
+                      isOtpVerified 
+                        ? 'bg-success/10 border border-success/20' 
+                        : 'bg-muted border border-border'
+                    }`}>
+                      <div className={`flex items-center gap-2 mb-2 ${
+                        isOtpVerified ? 'text-success' : 'text-muted-foreground'
+                      }`}>
                         <CheckCircle2 className="w-5 h-5" />
                         <span className="font-semibold">eNACH Mandate</span>
                       </div>
                       <p className="text-sm text-muted-foreground">
-                        By proceeding, you authorize automatic EMI deduction via eNACH
+                        {isOtpVerified 
+                          ? "You have successfully authorized automatic EMI deduction via eNACH"
+                          : "By proceeding, you authorize automatic EMI deduction via eNACH. OTP verification is required."
+                        }
                       </p>
                     </div>
 
@@ -167,7 +501,11 @@ const LoanApplication = () => {
                       <Button onClick={() => setStep(2)} variant="outline" className="flex-1">
                         Previous
                       </Button>
-                      <Button onClick={() => setStep(4)} className="flex-1 bg-gradient-accent">
+                      <Button 
+                        onClick={() => setStep(4)} 
+                        className="flex-1 bg-gradient-accent"
+                        disabled={!isOtpVerified}
+                      >
                         Next: Loan Amount
                         <ChevronRight className="w-4 h-4 ml-2" />
                       </Button>

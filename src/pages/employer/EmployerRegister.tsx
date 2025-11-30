@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { motion } from "framer-motion";
-import { Building2, ChevronRight, CheckCircle2 } from "lucide-react";
+import { Building2, ChevronRight, CheckCircle2, User, Phone, Mail } from "lucide-react";
 
 const steps = [
   { id: 1, title: "Company Details" },
@@ -28,7 +28,14 @@ const EmployerRegister = () => {
     udyamNumber: "",
     epfoNumber: "",
     emiDeduction: false,
-    nocAgreement: false
+    nocAgreement: false,
+    directors: [
+      {
+        name: "",
+        contactNumber: "",
+        email: ""
+      }
+    ]
   });
   const { toast } = useToast();
 
@@ -45,6 +52,45 @@ const EmployerRegister = () => {
 
   const handleInputChange = (field: string, value: string | boolean) => {
     setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handlePanChange = (value: string) => {
+    setFormData(prev => ({ ...prev, pan: value }));
+    
+    // Simulate auto-filling director information when PAN is entered
+    if (value.length === 10) {
+      // This would typically be an API call to MCA database
+      setTimeout(() => {
+        setFormData(prev => ({
+          ...prev,
+          directors: [
+            {
+              name: "Rajesh Kumar",
+              contactNumber: "+91 9876543210",
+              email: "rajesh.kumar@company.com"
+            },
+            {
+              name: "Priya Sharma",
+              contactNumber: "+91 9876543211", 
+              email: "priya.sharma@company.com"
+            }
+          ]
+        }));
+        toast({
+          title: "Director Details Fetched",
+          description: "Director information has been auto-filled from MCA records.",
+        });
+      }, 1000);
+    }
+  };
+
+  const handleDirectorChange = (index: number, field: string, value: string) => {
+    const updatedDirectors = [...formData.directors];
+    updatedDirectors[index] = {
+      ...updatedDirectors[index],
+      [field]: value
+    };
+    setFormData(prev => ({ ...prev, directors: updatedDirectors }));
   };
 
   const canProceed = () => {
@@ -118,7 +164,7 @@ const EmployerRegister = () => {
                 <motion.div
                   initial={{ opacity: 0, x: 20 }}
                   animate={{ opacity: 1, x: 0 }}
-                  className="space-y-4"
+                  className="space-y-6"
                 >
                   <div className="grid md:grid-cols-2 gap-4">
                     <div className="space-y-2">
@@ -168,9 +214,78 @@ const EmployerRegister = () => {
                         id="pan"
                         placeholder="AAAAA0000A"
                         value={formData.pan}
-                        onChange={(e) => handleInputChange("pan", e.target.value)}
+                        onChange={(e) => handlePanChange(e.target.value)}
                       />
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Director details will be auto-filled from MCA records
+                      </p>
                     </div>
+                  </div>
+
+                  {/* Directors Information Section */}
+                  <div className="space-y-4 pt-4 border-t">
+                    <div className="flex items-center gap-2">
+                      <User className="w-5 h-5 text-primary" />
+                      <Label className="text-lg font-semibold">Director Information</Label>
+                    </div>
+                    <p className="text-sm text-muted-foreground">
+                      Director details will be automatically fetched from MCA website using PAN
+                    </p>
+
+                    {formData.directors.map((director, index) => (
+                      <div key={index} className="space-y-4 p-4 border rounded-lg">
+                        <div className="flex items-center gap-2 mb-3">
+                          <div className="w-6 h-6 bg-primary/10 rounded-full flex items-center justify-center">
+                            <span className="text-xs font-medium text-primary">{index + 1}</span>
+                          </div>
+                          <span className="text-sm font-medium">Director {index + 1}</span>
+                        </div>
+
+                        <div className="space-y-2">
+                          <Label htmlFor={`director-name-${index}`}>Full Name</Label>
+                          <div className="relative">
+                            <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                            <Input
+                              id={`director-name-${index}`}
+                              placeholder="Enter director's full name"
+                              value={director.name}
+                              onChange={(e) => handleDirectorChange(index, "name", e.target.value)}
+                              className="pl-10"
+                            />
+                          </div>
+                        </div>
+
+                        <div className="grid md:grid-cols-2 gap-4">
+                          <div className="space-y-2">
+                            <Label htmlFor={`director-contact-${index}`}>Contact Number</Label>
+                            <div className="relative">
+                              <Phone className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                              <Input
+                                id={`director-contact-${index}`}
+                                placeholder="+91 9876543210"
+                                value={director.contactNumber}
+                                onChange={(e) => handleDirectorChange(index, "contactNumber", e.target.value)}
+                                className="pl-10"
+                              />
+                            </div>
+                          </div>
+                          <div className="space-y-2">
+                            <Label htmlFor={`director-email-${index}`}>Email Address</Label>
+                            <div className="relative">
+                              <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                              <Input
+                                id={`director-email-${index}`}
+                                type="email"
+                                placeholder="director@company.com"
+                                value={director.email}
+                                onChange={(e) => handleDirectorChange(index, "email", e.target.value)}
+                                className="pl-10"
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
                   </div>
 
                   <div className="space-y-2">
