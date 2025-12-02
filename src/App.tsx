@@ -13,6 +13,12 @@ import ApplicationStatus from "./pages/employee/ApplicationStatus";
 import NotFound from "./pages/NotFound";
 import LoanApproved from "./pages/employee/LoanApproved";
 import LoanRejected from "./pages/employee/LoanRejected";
+import Services from "./pages/Services";
+import CapitalMarket from "./pages/services/CapitalMarket";
+import DebtSyndication from "./pages/services/DebtSyndication";
+import AuditTaxation from "./pages/services/AuditTaxation";
+import FinancialAdvisory from "./pages/services/FinancialAdvisory";
+import GstAdvisory from "./pages/services/GstAdvisory";
 
 const queryClient = new QueryClient();
 
@@ -24,6 +30,12 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Home />} />
+          <Route path="/services" element={<Services />} />
+          <Route path="/services/capital-market" element={<CapitalMarket />} />
+          <Route path="/services/debt-syndication" element={<DebtSyndication />} />
+          <Route path="/services/audit-taxation" element={<AuditTaxation />} />
+          <Route path="/services/financial-advisory" element={<FinancialAdvisory />} />
+          <Route path="/services/gst-advisory" element={<GstAdvisory />} />
           <Route path="/employer/register" element={<EmployerRegister />} />
           <Route path="/employer/login" element={<EmployerLogin />} />
           <Route path="/employer/dashboard" element={<EmployerDashboard />} />
